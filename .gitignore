@@ -1,0 +1,12 @@
+node_modules
+.dist
+dist
+.next
+.turbo
+uploads
+.env
+.env.local
+*.log
+coverage
+.DS_Store
+apps/api/uploads

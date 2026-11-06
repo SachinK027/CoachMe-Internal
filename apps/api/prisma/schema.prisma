@@ -1,0 +1,424 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  SUPER_ADMIN
+  CONTENT_MANAGER
+  BOOKING_MANAGER
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum BookingStatus {
+  NEW
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  NONE
+  PENDING
+  PAID
+  REFUNDED
+  FAILED
+}
+
+enum EnquiryStatus {
+  NEW
+  IN_PROGRESS
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
+
+enum WorkshopFormat {
+  ONLINE
+  IN_PERSON
+}
+
+model AdminUser {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  roleId       String
+  role         Role       @relation(fields: [roleId], references: [id])
+  isActive     Boolean    @default(true)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  auditLogs    AuditLog[]
+  notes        BookingNote[]
+  enquiryNotes EnquiryNote[]
+}
+
+model Role {
+  id          String           @id @default(cuid())
+  name        RoleName         @unique
+  description String?
+  users       AdminUser[]
+  permissions RolePermission[]
+}
+
+model Permission {
+  id    String           @id @default(cuid())
+  key   String           @unique
+  label String
+  roles RolePermission[]
+}
+
+model RolePermission {
+  roleId       String
+  permissionId String
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permissionId])
+}
+
+model Page {
+  id          String        @id @default(cuid())
+  slug        String        @unique
+  title       String
+  description String?
+  status      PublishStatus @default(DRAFT)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  publishedAt DateTime?
+  isDeleted   Boolean       @default(false)
+  sections    PageSection[]
+}
+
+model PageSection {
+  id        String   @id @default(cuid())
+  pageId    String
+  page      Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  type      String
+  enabled   Boolean  @default(true)
+  sortOrder Int      @default(0)
+  content   Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ServiceCategory {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  services  Service[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Service {
+  id               String           @id @default(cuid())
+  slug             String           @unique
+  title            String
+  shortDescription String
+  heroDescription  String
+  audience         String
+  challenges       String[]
+  benefits         String[]
+  approach         String[]
+  faq              Json
+  duration         String?
+  priceLabel       String?
+  priceNote        String?
+  isComplimentary  Boolean          @default(false)
+  bookable         Boolean          @default(false)
+  imageUrl         String?
+  relatedSlugs     String[]
+  seoTitle         String?
+  seoDescription   String?
+  displayOrder     Int              @default(0)
+  status           PublishStatus    @default(PUBLISHED)
+  categoryId       String?
+  category         ServiceCategory? @relation(fields: [categoryId], references: [id])
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  publishedAt      DateTime?
+  isDeleted        Boolean          @default(false)
+  bookings         Booking[]
+}
+
+model Workshop {
+  id                 String            @id @default(cuid())
+  slug               String            @unique
+  title              String
+  language           String
+  format             WorkshopFormat
+  shortDescription   String
+  description        String
+  learningOutcomes   String[]
+  audience           String
+  facilitator        String
+  startDate          DateTime
+  endDate            DateTime
+  timeLabel          String
+  timezone           String
+  duration           String
+  price              Decimal           @db.Decimal(10, 2)
+  currency           String            @default("AED")
+  priceNote          String?
+  maxParticipants    Int
+  cancellationPolicy String
+  imageUrl           String?
+  status             PublishStatus     @default(PUBLISHED)
+  seoTitle           String?
+  seoDescription     String?
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  publishedAt        DateTime?
+  isDeleted          Boolean           @default(false)
+  sessions           WorkshopSession[]
+  bookings           Booking[]
+}
+
+model WorkshopSession {
+  id              String    @id @default(cuid())
+  workshopId      String
+  workshop        Workshop  @relation(fields: [workshopId], references: [id], onDelete: Cascade)
+  startsAt        DateTime
+  endsAt          DateTime
+  label           String
+  capacity        Int
+  seatsRemaining  Int
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  bookings        Booking[]
+
+  @@index([workshopId, startsAt])
+}
+
+model AvailabilityRule {
+  id         String   @id @default(cuid())
+  offeringSlug String
+  weekday    Int
+  startTime  String
+  endTime    String
+  timezone   String
+  slotMinutes Int
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([offeringSlug, weekday])
+}
+
+model AvailabilityException {
+  id           String   @id @default(cuid())
+  offeringSlug String
+  date         DateTime
+  isBlocked    Boolean  @default(true)
+  note         String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([offeringSlug, date])
+}
+
+model BookableSlot {
+  id           String    @id @default(cuid())
+  offeringSlug String
+  startsAt     DateTime
+  endsAt       DateTime
+  label        String
+  capacity     Int       @default(1)
+  seatsRemaining Int     @default(1)
+  source       String    @default("manual")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  bookings     Booking[]
+
+  @@index([offeringSlug, startsAt])
+}
+
+model Booking {
+  id               String            @id @default(cuid())
+  reference        String            @unique
+  firstName        String
+  lastName         String
+  email            String
+  phone            String
+  countryCode      String
+  jobTitle         String?
+  notes            String?
+  termsAccepted    Boolean
+  marketingConsent Boolean           @default(false)
+  offeringType     String
+  offeringSlug     String
+  serviceId        String?
+  service          Service?          @relation(fields: [serviceId], references: [id])
+  workshopId       String?
+  workshop         Workshop?         @relation(fields: [workshopId], references: [id])
+  sessionId        String?
+  session          WorkshopSession?  @relation(fields: [sessionId], references: [id])
+  slotId           String?
+  slot             BookableSlot?     @relation(fields: [slotId], references: [id])
+  startsAt         DateTime
+  endsAt           DateTime
+  timezone         String
+  durationMinutes  Int
+  amount           Decimal?          @db.Decimal(10, 2)
+  currency         String?           @default("AED")
+  bookingStatus    BookingStatus     @default(NEW)
+  paymentStatus    PaymentStatus     @default(NONE)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  isDeleted        Boolean           @default(false)
+  history          BookingStatusHistory[]
+  internalNotes    BookingNote[]
+
+  @@index([email, createdAt])
+  @@index([bookingStatus, paymentStatus])
+}
+
+model BookingStatusHistory {
+  id         String        @id @default(cuid())
+  bookingId  String
+  booking    Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromStatus BookingStatus?
+  toStatus   BookingStatus
+  note       String?
+  createdAt  DateTime      @default(now())
+}
+
+model BookingNote {
+  id        String    @id @default(cuid())
+  bookingId String
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    AdminUser? @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime  @default(now())
+}
+
+model BlogCategory {
+  id        String     @id @default(cuid())
+  name      String     @unique
+  slug      String     @unique
+  posts     BlogPost[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model BlogTag {
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  posts     PostTag[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model BlogPost {
+  id              String         @id @default(cuid())
+  slug            String         @unique
+  title           String
+  excerpt         String
+  body            String
+  authorName      String
+  coverImageUrl   String?
+  readingMinutes  Int
+  featured        Boolean        @default(false)
+  status          PublishStatus  @default(DRAFT)
+  seoTitle        String?
+  seoDescription  String?
+  categoryId      String?
+  category        BlogCategory?  @relation(fields: [categoryId], references: [id])
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  isDeleted       Boolean        @default(false)
+  tags            PostTag[]
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    BlogTag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Testimonial {
+  id          String         @id @default(cuid())
+  clientName  String?
+  designation String?
+  company     String?
+  body        String
+  photoUrl    String?
+  displayOrder Int           @default(0)
+  status      PublishStatus  @default(DRAFT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  isDeleted   Boolean        @default(false)
+}
+
+model Enquiry {
+  id        String         @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String
+  message   String
+  status    EnquiryStatus  @default(NEW)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  isDeleted Boolean        @default(false)
+  notes     EnquiryNote[]
+}
+
+model EnquiryNote {
+  id        String     @id @default(cuid())
+  enquiryId String
+  enquiry   Enquiry    @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  authorId  String?
+  author    AdminUser? @relation(fields: [authorId], references: [id])
+  body      String
+  createdAt DateTime   @default(now())
+}
+
+model MediaAsset {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  mimeType     String
+  sizeBytes    Int
+  url          String
+  folder       String   @default("general")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  isDeleted    Boolean  @default(false)
+}
+
+model WebsiteSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id         String     @id @default(cuid())
+  actorId    String?
+  actor      AdminUser? @relation(fields: [actorId], references: [id])
+  action     String
+  entityType String?
+  entityId   String?
+  metadata   Json?
+  createdAt  DateTime   @default(now())
+
+  @@index([createdAt])
+}
