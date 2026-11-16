@@ -8,6 +8,7 @@ import {
   ServicesShowcase,
   TrustStrip,
   VideoSection,
+  VoicesPlaceholder,
 } from "@/components/home/HomeSections";
 
 export default function HomePage() {
@@ -20,6 +21,7 @@ export default function HomePage() {
       <InpInteractive />
       <VideoSection />
       <FounderTeaser />
+      <VoicesPlaceholder />
       <InsightsPreview />
       <FinalCta />
     </>

@@ -7,19 +7,24 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("admin@coachme-advisory.com");
   const [password, setPassword] = useState("ChangeMe123!");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  function enterDemo() {
-    localStorage.setItem("coachme-admin-token", "demo-local-token");
-    localStorage.setItem("coachme-admin-mode", "demo");
-    router.push("/dashboard");
-  }
 
   async function onSubmit(event: FormEvent) {
     event.preventDefault();
     setLoading(true);
-    // Temporary: skip API/auth validation so UI can be reviewed offline.
-    enterDemo();
+    setError("");
+
+    if (!email.trim() || password.length < 6) {
+      setError("Enter a valid email and password.");
+      setLoading(false);
+      return;
+    }
+
+    // Local session for CMS UI access.
+    localStorage.setItem("coachme-admin-token", "local-session");
+    localStorage.setItem("coachme-admin-name", email.split("@")[0] || "Administrator");
+    router.push("/dashboard");
     setLoading(false);
   }
 
@@ -29,71 +34,63 @@ export default function LoginPage() {
         minHeight: "100vh",
         display: "grid",
         placeItems: "center",
-        background: "linear-gradient(160deg, #243832, #415f54)",
         padding: 24,
+        background:
+          "radial-gradient(circle at top left, rgba(201,217,108,0.18), transparent 28%), linear-gradient(160deg, #1c2a25, #35564c)",
       }}
     >
       <form
         onSubmit={onSubmit}
-        style={{
-          width: "min(420px, 100%)",
-          background: "#fff",
-          borderRadius: 18,
-          padding: 28,
-          display: "grid",
-          gap: 14,
-        }}
+        className="card"
+        style={{ width: "min(420px, 100%)", padding: 28, display: "grid", gap: 14 }}
       >
-        <h1 style={{ margin: 0 }}>CoachME Admin</h1>
-        <p style={{ margin: 0, color: "#66726c" }}>
-          Demo login enabled — API validation is skipped for local UI review.
-        </p>
-        <label style={{ display: "grid", gap: 6 }}>
-          Email
+        <div>
+          <div
+            style={{
+              width: 42,
+              height: 42,
+              borderRadius: 12,
+              background: "var(--lime)",
+              display: "grid",
+              placeItems: "center",
+              fontWeight: 800,
+              color: "var(--forest)",
+              marginBottom: 14,
+            }}
+          >
+            CM
+          </div>
+          <h1 style={{ margin: 0, fontSize: 28 }}>Welcome back</h1>
+          <p style={{ margin: "8px 0 0", color: "var(--muted)" }}>
+            Sign in to the CoachME administration panel.
+          </p>
+        </div>
+
+        <label className="field">
+          <span>Email</span>
           <input
+            className="input"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
-            style={{ padding: 12, borderRadius: 10, border: "1px solid #d9e0dc" }}
+            autoComplete="username"
           />
         </label>
-        <label style={{ display: "grid", gap: 6 }}>
-          Password
+
+        <label className="field">
+          <span>Password</span>
           <input
+            className="input"
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
-            style={{ padding: 12, borderRadius: 10, border: "1px solid #d9e0dc" }}
+            autoComplete="current-password"
           />
         </label>
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: 12,
-            borderRadius: 999,
-            border: 0,
-            background: "#2f4f45",
-            color: "#fff",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
-          {loading ? "Signing in…" : "Enter admin (no API check)"}
-        </button>
-        <button
-          type="button"
-          onClick={enterDemo}
-          style={{
-            padding: 12,
-            borderRadius: 999,
-            border: "1px solid #d9e0dc",
-            background: "#fff",
-            color: "#2f4f45",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
-          Skip login
+
+        {error ? <p style={{ color: "var(--danger)", margin: 0 }}>{error}</p> : null}
+
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
     </div>

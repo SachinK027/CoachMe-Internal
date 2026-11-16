@@ -1,62 +1,44 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
-import { apiFetch } from "@/lib/api";
+import { Badge, PageHeader } from "@/components/ui";
 
-type EnquiryRow = {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  message: string;
-  status: string;
-};
+const enquiries = [
+  {
+    id: "1",
+    name: "Aisha Khan",
+    email: "aisha@example.com",
+    message: "Interested in team advisory for a leadership group in Dubai.",
+    status: "New",
+  },
+  {
+    id: "2",
+    name: "Tom Hughes",
+    email: "daniel@example.com",
+    message: "Requesting details about the November English workshop.",
+    status: "In Progress",
+  },
+];
 
 export default function EnquiriesAdminPage() {
-  const [rows, setRows] = useState<EnquiryRow[]>([]);
-
-  useEffect(() => {
-    apiFetch<EnquiryRow[]>("/admin/enquiries").then(setRows).catch(() => setRows([]));
-  }, []);
-
   return (
     <div>
-      <PageHeader title="Enquiries" description="Contact form submissions and status tracking." />
-      <div style={{ display: "grid", gap: 10 }}>
-        {rows.length === 0 ? (
-          <p style={{ color: "var(--muted)" }}>No enquiries yet.</p>
-        ) : (
-          rows.map((row) => (
-            <article
-              key={row.id}
-              style={{
-                background: "#fff",
-                border: "1px solid var(--line)",
-                borderRadius: 14,
-                padding: 16,
-              }}
-            >
-              <strong>
-                {row.firstName} {row.lastName}
-              </strong>
-              <div style={{ color: "var(--muted)" }}>{row.email}</div>
-              <p style={{ marginTop: 8 }}>{row.message}</p>
-              <span
-                style={{
-                  display: "inline-block",
-                  marginTop: 8,
-                  padding: "4px 10px",
-                  borderRadius: 999,
-                  background: "var(--accent-soft)",
-                  fontSize: 12,
-                }}
-              >
-                {row.status}
-              </span>
-            </article>
-          ))
-        )}
+      <PageHeader
+        title="Enquiries"
+        description="Contact form submissions from the public website."
+      />
+      <div className="list-card">
+        {enquiries.map((item) => (
+          <article key={item.id} className="card" style={{ padding: 18 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <div>
+                <strong>{item.name}</strong>
+                <div style={{ color: "var(--muted)", fontSize: 13 }}>{item.email}</div>
+              </div>
+              <Badge tone={item.status === "New" ? "warning" : "info"}>{item.status}</Badge>
+            </div>
+            <p style={{ margin: "12px 0 0", color: "var(--muted)" }}>{item.message}</p>
+          </article>
+        ))}
       </div>
     </div>
   );

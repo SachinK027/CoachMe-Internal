@@ -135,11 +135,16 @@ export const founder = {
 export const homepage = {
   hero: {
     brand: "CoachME Advisory",
-    headline: "Better leadership. Clearer decisions. Stronger performance.",
+    eyebrow: "People. Processes. Performance.",
+    headline: "For leaders who carry a lot.",
+    supportingLine: "For teams that need to work better together.",
     supporting:
-      "Private advisory for leaders and teams navigating complexity, pressure and change.",
-    primaryCta: { label: "Explore Our Approach", href: "/about/our-approach" },
-    secondaryCta: { label: "Book an Introduction Call", href: "/booking/strategic-introduction-call" },
+      "Business advisory for leaders, teams and businesses navigating complexity, pressure and change.",
+    primaryCta: { label: "Explore Working Together", href: "/services" },
+    secondaryCta: {
+      label: "Book a Strategic Introduction Call",
+      href: "/booking/strategic-introduction-call",
+    },
     image: "/images/hero-founder.jpg",
   },
   brandIntro: {

@@ -9,6 +9,7 @@
   --charcoal: #252b29;
   --white: #ffffff;
   --muted: #5f6b66;
+  --accent: #c9d96c;
   --line: rgba(37, 43, 41, 0.12);
   --background: var(--ivory);
   --foreground: var(--charcoal);
@@ -24,9 +25,27 @@
   --color-sage: var(--sage);
   --color-charcoal: var(--charcoal);
   --color-muted: var(--muted);
+  --color-accent: var(--accent);
   --color-line: var(--line);
   --font-sans: "Manrope", "Segoe UI", sans-serif;
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
+@keyframes experience-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.experience-badge-spin {
+  transform-origin: center center;
+  animation: experience-spin 12s linear infinite;
+  animation-duration: 12s !important;
+  animation-iteration-count: infinite !important;
+  will-change: transform;
 }
 
 * {
@@ -129,11 +148,17 @@ img {
     scroll-behavior: auto;
   }
 
-  *,
-  *::before,
-  *::after {
+  *:not(.experience-badge-spin),
+  *:not(.experience-badge-spin)::before,
+  *:not(.experience-badge-spin)::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .experience-badge-spin {
+    animation: experience-spin 12s linear infinite !important;
+    animation-duration: 12s !important;
+    animation-iteration-count: infinite !important;
   }
 }

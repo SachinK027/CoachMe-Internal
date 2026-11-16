@@ -12,6 +12,7 @@ import {
   siteSettings,
   verifiedStats,
 } from "@coachme/content";
+import { AnimatedStat } from "@/components/ui/AnimatedStat";
 import { Button } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
@@ -24,11 +25,15 @@ export function BrandIntro() {
       <div className="container-page grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
         <Reveal>
           <p className="eyebrow">{brandIntro.eyebrow}</p>
-          <h2 className="display mt-4 text-4xl md:text-5xl">{brandIntro.headline}</h2>
+          <h2 className="display mt-4 text-4xl text-charcoal md:text-5xl">
+            {brandIntro.headline}
+          </h2>
         </Reveal>
         <Reveal delay={0.1}>
           <p className="text-2xl leading-relaxed text-forest md:text-3xl">{brandIntro.body}</p>
-          <p className="mt-5 max-w-xl text-muted leading-relaxed">{brandIntro.supporting}</p>
+          <p className="mt-5 max-w-xl text-base leading-relaxed text-muted md:text-lg">
+            {brandIntro.supporting}
+          </p>
         </Reveal>
       </div>
     </section>
@@ -41,10 +46,14 @@ export function TrustStrip() {
       <div className="container-page grid gap-8 py-12 md:grid-cols-2">
         {verifiedStats.map((stat, index) => (
           <Reveal key={stat.label} delay={index * 0.08}>
-            <div className="flex items-end justify-between gap-6 border-l-2 border-champagne pl-6">
+            <div className="flex items-end justify-between gap-6 border-l-2 border-[var(--accent)] pl-6">
               <div>
-                <p className="display text-5xl text-forest md:text-6xl">{stat.value}</p>
-                <p className="mt-2 text-sm uppercase tracking-[0.16em] text-muted">{stat.label}</p>
+                <p className="display text-5xl text-forest md:text-6xl">
+                  <AnimatedStat value={stat.value} />
+                </p>
+                <p className="mt-2 text-sm uppercase tracking-[0.16em] text-muted">
+                  {stat.label}
+                </p>
               </div>
               {stat.sourceNote ? (
                 <p className="max-w-[12rem] text-right text-xs leading-relaxed text-muted">
@@ -61,50 +70,56 @@ export function TrustStrip() {
 
 export function ServicesShowcase() {
   return (
-    <section className="section-pad">
+    <section className="section-pad surface-ivory">
       <div className="container-page">
         <SectionHeading
           eyebrow="Ways we can work together"
           title="Advisory shaped around diagnosis, not generic programmes."
-          description="Explore the services currently offered by CoachME Advisory."
+          description="Four clear ways to engage — from a first conversation to deeper advisory work."
         />
-        <div className="mt-14 space-y-8">
+
+        <div className="mt-14 grid gap-5 md:grid-cols-2">
           {services.map((service, index) => (
             <Reveal key={service.slug} delay={index * 0.05}>
-              <article className="group grid overflow-hidden rounded-[2rem] border border-line bg-white lg:grid-cols-[1.1fr_0.9fr]">
-                <div className="flex flex-col justify-between p-8 md:p-10">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sage">
+              <Link href={`/services/${service.slug}`} className="group block h-full">
+                <article className="relative flex h-full flex-col overflow-hidden rounded-[1.75rem] border border-line bg-[#eef3ee] p-7 transition-all duration-400 hover:-translate-y-1 hover:border-transparent hover:bg-forest hover:shadow-[0_28px_60px_rgba(38,63,56,0.28)] md:p-8">
+                  <div className="flex items-start justify-between gap-4">
+                    <p className="display text-4xl text-forest/20 transition group-hover:text-[var(--accent)]/70 md:text-5xl">
                       {String(index + 1).padStart(2, "0")}
                     </p>
-                    <h3 className="display mt-4 text-3xl md:text-4xl">{service.title}</h3>
-                    <p className="mt-4 max-w-xl text-muted leading-relaxed">
-                      {service.shortDescription}
-                    </p>
-                    <p className="mt-3 text-sm text-forest">{service.audience}</p>
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-forest/15 text-forest transition group-hover:border-[var(--accent)]/40 group-hover:text-[var(--accent)]">
+                      ↗
+                    </span>
                   </div>
-                  <div className="mt-8 flex flex-wrap gap-3">
-                    <Button href={`/services/${service.slug}`} variant="secondary">
-                      Learn more
-                    </Button>
-                    {service.bookable ? (
-                      <Button href={`/booking/${service.slug}`}>Book</Button>
-                    ) : (
-                      <Button href="/booking/strategic-introduction-call">
-                        Start with an intro call
-                      </Button>
-                    )}
+
+                  <div className="relative mt-6 aspect-[16/10] overflow-hidden rounded-[1.25rem]">
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      fill
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                    />
                   </div>
-                </div>
-                <div className="relative min-h-[16rem] overflow-hidden">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    fill
-                    className="object-cover transition duration-700 group-hover:scale-105"
-                  />
-                </div>
-              </article>
+
+                  <h3 className="display mt-6 text-2xl text-charcoal transition group-hover:text-white md:text-3xl">
+                    {service.title}
+                  </h3>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-muted transition group-hover:text-white/80 md:text-base">
+                    {service.shortDescription}
+                  </p>
+
+                  <div className="mt-6 flex items-center justify-between gap-3">
+                    <span className="text-sm font-semibold text-forest transition group-hover:text-[var(--accent)]">
+                      {service.bookable ? "Book / learn more" : "Learn more"}
+                    </span>
+                    {service.priceLabel ? (
+                      <span className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-forest transition group-hover:bg-white/10 group-hover:text-white">
+                        {service.priceLabel}
+                      </span>
+                    ) : null}
+                  </div>
+                </article>
+              </Link>
             </Reveal>
           ))}
         </div>
@@ -114,47 +129,75 @@ export function ServicesShowcase() {
 }
 
 export function InpInteractive() {
-  const [active, setActive] = useState(0);
-  const current = inpMethod[active];
+  const [active, setActive] = useState(1);
 
   return (
-    <section className="section-pad surface-forest grain">
-      <div className="container-page relative z-10">
+    <section className="section-pad bg-white">
+      <div className="container-page">
         <SectionHeading
-          invert
-          eyebrow="INP Method"
-          title="A practical three-step approach."
-          description="Identify challenges, navigate change and improve performance across people, processes and business operations."
+          eyebrow="Our method"
+          title="The INP Method"
+          description="A practical 3-step approach to identifying challenges, navigating change and improving performance across people, processes and business operations."
         />
-        <div className="mt-12 grid gap-8 lg:grid-cols-[0.85fr_1.15fr]">
-          <div className="space-y-3">
-            {inpMethod.map((step, index) => (
+
+        <div className="mt-8 h-px w-full overflow-hidden bg-line">
+          <div
+            className="h-full bg-forest transition-all duration-500"
+            style={{ width: `${((active + 1) / inpMethod.length) * 100}%` }}
+          />
+        </div>
+
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {inpMethod.map((step, index) => {
+            const isActive = active === index;
+            return (
               <button
                 key={step.title}
                 type="button"
+                onMouseEnter={() => setActive(index)}
+                onFocus={() => setActive(index)}
                 onClick={() => setActive(index)}
-                className={`w-full rounded-2xl border px-5 py-5 text-left transition ${
-                  active === index
-                    ? "border-champagne bg-white/10"
-                    : "border-white/10 hover:border-white/25"
+                className={`rounded-[1.75rem] border p-7 text-left transition-all duration-400 md:min-h-[17rem] md:p-8 ${
+                  isActive
+                    ? "border-transparent bg-forest text-white shadow-[0_28px_60px_rgba(38,63,56,0.28)]"
+                    : "border-transparent bg-[#eef3ee] text-charcoal hover:-translate-y-1"
                 }`}
               >
-                <p className="text-xs tracking-[0.18em] text-champagne">{step.step}</p>
-                <p className="mt-2 display text-2xl text-ivory">{step.title}</p>
-                <p className="mt-2 text-sm text-ivory/70">{step.summary}</p>
+                <div className="flex items-start justify-between gap-3">
+                  <p
+                    className={`display text-4xl md:text-5xl ${
+                      isActive ? "text-[var(--accent)]" : "text-forest/20"
+                    }`}
+                  >
+                    {step.step}
+                  </p>
+                  <span
+                    className={`text-lg ${isActive ? "text-[var(--accent)]" : "text-forest/40"}`}
+                  >
+                    ↗
+                  </span>
+                </div>
+                <h3
+                  className={`display mt-8 text-3xl ${isActive ? "text-white" : "text-forest"}`}
+                >
+                  {step.title}
+                </h3>
+                <p
+                  className={`mt-3 text-sm leading-relaxed md:text-base ${
+                    isActive ? "text-white/80" : "text-muted"
+                  }`}
+                >
+                  {step.summary}
+                </p>
               </button>
-            ))}
-          </div>
-          <Reveal>
-            <div className="flex h-full flex-col justify-center rounded-[2rem] bg-ivory p-8 md:p-12 text-charcoal">
-              <p className="eyebrow">{current.step}</p>
-              <h3 className="display mt-4 text-4xl md:text-5xl">{current.title}</h3>
-              <p className="mt-6 text-lg leading-relaxed text-muted">{current.detail}</p>
-              <Button href="/about/inp-method" className="mt-8 w-fit" variant="secondary">
-                Explore the method
-              </Button>
-            </div>
-          </Reveal>
+            );
+          })}
+        </div>
+
+        <div className="mt-10">
+          <Button href="/about/inp-method" variant="secondary">
+            Explore the method
+          </Button>
         </div>
       </div>
     </section>
@@ -166,23 +209,32 @@ export function VideoSection() {
   if (!video) return null;
 
   return (
-    <section className="section-pad surface-ivory">
-      <div className="container-page grid gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-center">
+    <section className="section-pad surface-forest grain">
+      <div className="container-page relative z-10 grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <Reveal>
-          <SectionHeading
-            eyebrow="Introduction"
-            title={video.title}
-            description="Video can be configured through website settings once the CMS is connected. For now this section uses the founder portrait as a premium placeholder."
-          />
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[var(--accent)]">
+            Introduction
+          </p>
+          <h2 className="display mt-4 text-4xl text-white md:text-5xl">
+            Get to know CoachME
+          </h2>
+          <p className="mt-5 max-w-md text-base leading-relaxed text-white/80 md:text-lg">
+            Understand how we approach business challenges, leadership and organisational
+            performance.
+          </p>
         </Reveal>
         <Reveal delay={0.1}>
           <div className="relative aspect-[16/10] overflow-hidden rounded-[2rem]">
             <Image src={video.thumbnail} alt={video.title} fill className="object-cover" />
-            <div className="absolute inset-0 bg-forest/35" />
+            <div className="absolute inset-0 bg-forest/45" />
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-ivory text-forest shadow-xl">
+              <button
+                type="button"
+                aria-label="Play introduction video"
+                className="flex h-20 w-20 items-center justify-center rounded-full bg-[var(--accent)] text-forest shadow-[0_0_0_8px_rgba(201,217,108,0.2),0_18px_40px_rgba(0,0,0,0.28)] transition hover:scale-105 hover:shadow-[0_0_0_10px_rgba(201,217,108,0.28),0_22px_48px_rgba(0,0,0,0.32)]"
+              >
                 <span className="ml-1 text-2xl">▶</span>
-              </div>
+              </button>
             </div>
           </div>
         </Reveal>
@@ -193,7 +245,7 @@ export function VideoSection() {
 
 export function FounderTeaser() {
   return (
-    <section className="section-pad">
+    <section className="section-pad surface-ivory">
       <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
         <Reveal>
           <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem]">
@@ -202,8 +254,10 @@ export function FounderTeaser() {
         </Reveal>
         <Reveal delay={0.1}>
           <p className="eyebrow">Founder</p>
-          <h2 className="display mt-4 text-4xl md:text-5xl">{founder.name}</h2>
-          <p className="mt-2 text-forest">{founder.role} · {founder.credentials}</p>
+          <h2 className="display mt-4 text-4xl text-charcoal md:text-5xl">{founder.name}</h2>
+          <p className="mt-2 text-forest">
+            {founder.role} · {founder.credentials}
+          </p>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">{founder.shortBio}</p>
           <Button href="/about" className="mt-8" variant="secondary">
             Read the founder story
@@ -214,9 +268,32 @@ export function FounderTeaser() {
   );
 }
 
+export function VoicesPlaceholder() {
+  return (
+    <section className="section-pad bg-white">
+      <div className="container-page">
+        <SectionHeading eyebrow="Voices" title="What clients say" />
+        <Reveal>
+          <div className="mt-10 rounded-[2rem] bg-[#e7efe8] p-8 md:p-12">
+            <p className="display text-6xl leading-none text-forest/25">&ldquo;</p>
+            <p className="display mt-4 max-w-3xl text-2xl text-forest md:text-3xl">
+              Client testimonial to be added. Share a short quote describing the impact of working
+              with CoachME.
+            </p>
+            <p className="mt-6 text-sm text-muted">Client name — Role, organisation</p>
+            <p className="mt-8 text-xs text-muted">
+              Placeholder — real testimonials to be supplied. No fabricated quotes are shown.
+            </p>
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+}
+
 export function InsightsPreview() {
   return (
-    <section className="section-pad border-t border-line bg-white">
+    <section className="section-pad border-t border-line surface-ivory">
       <div className="container-page">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <SectionHeading
@@ -231,7 +308,7 @@ export function InsightsPreview() {
           {blogPosts.map((post, index) => (
             <Reveal key={post.slug} delay={index * 0.06}>
               <Link href={`/blog/${post.slug}`} className="group block h-full">
-                <article className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-line bg-ivory transition hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(37,43,41,0.08)]">
+                <article className="flex h-full flex-col overflow-hidden rounded-[1.5rem] border border-line bg-white transition hover:-translate-y-1 hover:shadow-[0_24px_50px_rgba(37,43,41,0.08)]">
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <Image
                       src={post.coverImage}
@@ -244,7 +321,7 @@ export function InsightsPreview() {
                     <p className="text-xs uppercase tracking-[0.16em] text-muted">
                       {formatDate(post.publishedAt)} · {post.readingTimeMinutes} min
                     </p>
-                    <h3 className="mt-3 display text-2xl leading-tight group-hover:text-forest">
+                    <h3 className="mt-3 display text-2xl leading-tight text-charcoal group-hover:text-forest">
                       {post.title}
                     </h3>
                     <p className="mt-3 text-sm leading-relaxed text-muted line-clamp-3">
@@ -267,10 +344,10 @@ export function FinalCta() {
     <section className="section-pad surface-forest grain">
       <div className="container-page relative z-10 max-w-3xl text-center">
         <Reveal>
-          <h2 className="display text-4xl text-ivory md:text-5xl">{finalCta.headline}</h2>
-          <p className="mx-auto mt-5 max-w-2xl text-lg text-ivory/75">{finalCta.body}</p>
-          <Button href={finalCta.cta.href} variant="inverse" className="mt-8">
-            {finalCta.cta.label}
+          <h2 className="display text-4xl text-white md:text-5xl">{finalCta.headline}</h2>
+          <p className="mx-auto mt-5 max-w-2xl text-lg text-white/85">{finalCta.body}</p>
+          <Button href={finalCta.cta.href} variant="accent" className="mt-8">
+            {finalCta.cta.label} →
           </Button>
         </Reveal>
       </div>

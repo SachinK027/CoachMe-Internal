@@ -79,7 +79,13 @@ export function Header() {
         </nav>
 
         <div className="hidden lg:block">
-          <Button href="/booking/strategic-introduction-call">Book Introduction Call</Button>
+          <Button
+            href="/booking/strategic-introduction-call"
+            variant="accent"
+            className="!text-forest"
+          >
+            Book Introduction Call
+          </Button>
         </div>
 
         <button
@@ -122,7 +128,11 @@ export function Header() {
                 ))}
               </div>
             ))}
-            <Button href="/booking/strategic-introduction-call" className="mt-2 w-full">
+            <Button
+              href="/booking/strategic-introduction-call"
+              variant="accent"
+              className="mt-2 w-full !text-[#1b2e29]"
+            >
               Book Introduction Call
             </Button>
           </div>

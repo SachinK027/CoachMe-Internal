@@ -1,35 +1,35 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
-import { apiFetch } from "@/lib/api";
+import { PageHeader } from "@/components/ui";
 
 export default function SettingsAdminPage() {
-  const [settings, setSettings] = useState<Record<string, unknown> | null>(null);
-
-  useEffect(() => {
-    apiFetch<Record<string, unknown>>("/settings", { auth: false })
-      .then(setSettings)
-      .catch(() => setSettings(null));
-  }, []);
-
   return (
     <div>
       <PageHeader
         title="Website settings"
-        description="Logo, contact details, social links, SEO defaults and tracking configuration."
+        description="Manage brand, contact details and default SEO configuration."
+        actions={
+          <button type="button" className="btn btn-primary">
+            Save settings
+          </button>
+        }
       />
-      <pre
-        style={{
-          background: "#fff",
-          border: "1px solid var(--line)",
-          borderRadius: 14,
-          padding: 16,
-          overflow: "auto",
-        }}
-      >
-        {JSON.stringify(settings, null, 2)}
-      </pre>
+      <section className="card" style={{ padding: 20, display: "grid", gap: 14 }}>
+        <div className="field-row">
+          <label className="field">
+            <span>Website name</span>
+            <input className="input" defaultValue="CoachME Advisory" />
+          </label>
+          <label className="field">
+            <span>Contact email</span>
+            <input className="input" defaultValue="office@coachme-advisory.com" />
+          </label>
+        </div>
+        <label className="field">
+          <span>Location</span>
+          <input className="input" defaultValue="Ras Al Khaimah, United Arab Emirates" />
+        </label>
+      </section>
     </div>
   );
 }

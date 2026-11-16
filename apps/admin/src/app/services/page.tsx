@@ -1,57 +1,78 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { PageHeader } from "@/components/PageHeader";
-import { apiFetch } from "@/lib/api";
-import { demoServices } from "@/lib/demo-data";
+import { PageHeader, Badge } from "@/components/ui";
 
-type ServiceRow = {
-  slug: string;
-  title: string;
-  shortDescription?: string;
-  priceLabel?: string;
-};
+const services = [
+  {
+    title: "Strategic Introduction Call",
+    slug: "strategic-introduction-call",
+    price: "Complimentary",
+    status: "Published",
+  },
+  {
+    title: "Business Operations Advisory",
+    slug: "business-operations-advisory",
+    price: "Custom",
+    status: "Published",
+  },
+  {
+    title: "Teams Advisory & Workshops",
+    slug: "teams-advisory-workshops",
+    price: "Custom",
+    status: "Published",
+  },
+  {
+    title: "1:1 Exclusive Advisory",
+    slug: "1-1-exclusive-advisory",
+    price: "8,000 AED",
+    status: "Published",
+  },
+];
 
 export default function ServicesAdminPage() {
-  const [rows, setRows] = useState<ServiceRow[]>(demoServices);
-
-  useEffect(() => {
-    apiFetch<ServiceRow[]>("/services", { auth: false })
-      .then(setRows)
-      .catch(() => setRows(demoServices));
-  }, []);
-
   return (
     <div>
       <PageHeader
         title="Services"
-        description="Demo data shown when API is offline."
+        description="Published advisory services available on the public website."
+        actions={
+          <button type="button" className="btn btn-primary">
+            + Add service
+          </button>
+        }
       />
-      <table style={{ width: "100%", borderCollapse: "collapse", background: "#fff" }}>
-        <thead>
-          <tr>
-            {["Title", "Slug", "Price"].map((heading) => (
-              <th
-                key={heading}
-                style={{ textAlign: "left", padding: 12, borderBottom: "1px solid var(--line)" }}
-              >
-                {heading}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr key={row.slug}>
-              <td style={{ padding: 12, borderBottom: "1px solid var(--line)" }}>{row.title}</td>
-              <td style={{ padding: 12, borderBottom: "1px solid var(--line)" }}>{row.slug}</td>
-              <td style={{ padding: 12, borderBottom: "1px solid var(--line)" }}>
-                {row.priceLabel || "—"}
-              </td>
+      <section className="card table-wrap">
+        <table className="data">
+          <thead>
+            <tr>
+              <th>Service</th>
+              <th>Slug</th>
+              <th>Price</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {services.map((service) => (
+              <tr key={service.slug}>
+                <td>
+                  <strong>{service.title}</strong>
+                </td>
+                <td>{service.slug}</td>
+                <td>{service.price}</td>
+                <td>
+                  <Badge tone="success">{service.status}</Badge>
+                </td>
+                <td>
+                  <button type="button" className="btn btn-secondary">
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </div>
   );
 }
